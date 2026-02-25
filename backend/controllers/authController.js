@@ -75,6 +75,11 @@ export const login = async (req, res) => {
 
     const token = generateToken(user._id);
 
+    // Update online status
+    user.isOnline = true;
+    user.lastSeen = new Date();
+    await user.save();
+
     res.status(200).json({
       message: "Login successful",
       token,

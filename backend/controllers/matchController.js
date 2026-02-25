@@ -11,6 +11,10 @@ export const likeUser = async (req, res) => {
       return res.status(400).json({ message: "Target user ID is required" });
     }
 
+    if (currentUserId === targetUserId) {
+      return res.status(400).json({ message: "You cannot like yourself" });
+    }
+
     // Check if target user exists
     const targetUser = await User.findById(targetUserId);
     if (!targetUser) {

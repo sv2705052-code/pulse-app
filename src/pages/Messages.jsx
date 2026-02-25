@@ -107,7 +107,7 @@ const Messages = () => {
       </div>
 
       {/* Input */}
-      <form onSubmit={send} style={{ display: 'flex', gap: 10, padding: '12px 16px', background: 'var(--surface)', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
+      <form onSubmit={send} style={{ display: 'flex', gap: 10, padding: '16px 16px 20px', background: 'var(--surface)', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
         <input
           value={text}
           onChange={e => setText(e.target.value)}

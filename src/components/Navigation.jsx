@@ -11,6 +11,11 @@ const Navigation = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
+  // Hide navigation on messages page to avoid overlapping the chat input
+  if (pathname.startsWith('/messages/')) {
+    return null;
+  }
+
   return (
     <nav style={{
       position: 'fixed',
