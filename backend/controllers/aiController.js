@@ -5,19 +5,28 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 export const analyzeMatch = async (req, res) => {
     try {
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({
+                message: "Gemini API key is not configured on the server. Please add GEMINI_API_KEY to environment variables."
+            });
+        }
+
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         const { matchId } = req.params;
 
-        // Find the match
-        const match = await Match.findById(matchId).populate("users");
+        // Find the match and populate both users
+        const match = await Match.findById(matchId).populate("user1").populate("user2");
         if (!match) {
             return res.status(404).json({ message: "Match not found" });
         }
 
-        const [user1, user2] = match.users;
+        const { user1, user2 } = match;
+
+        if (!user1 || !user2) {
+            return res.status(400).json({ message: "Match users not found" });
+        }
 
         // Construct profile summaries for AI
         const profile1 = {

@@ -26,10 +26,19 @@ const Login = () => {
 
   return (
     <div className="center" style={{ background: 'radial-gradient(ellipse at 60% 0%, rgba(168,85,247,.18) 0%, transparent 60%), radial-gradient(ellipse at 0% 100%, rgba(236,72,153,.12) 0%, transparent 60%), var(--bg)' }}>
+      <style>{`
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          14% { transform: scale(1.3); }
+          28% { transform: scale(1); }
+          42% { transform: scale(1.15); }
+          70% { transform: scale(1); }
+        }
+      `}</style>
       <div style={{ width: '100%', maxWidth: 420 }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ fontSize: 48, marginBottom: 8 }}>💜</div>
+          <div style={{ fontSize: 64, marginBottom: 12, display: 'inline-block', animation: 'heartbeat 1.5s ease-in-out infinite' }}>💜</div>
           <h1 style={{ fontSize: 32, fontWeight: 800 }} className="grad-text">Pulse</h1>
           <p style={{ color: 'var(--muted)', marginTop: 6, fontSize: 14 }}>Find your perfect match</p>
         </div>
