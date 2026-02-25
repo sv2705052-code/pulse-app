@@ -127,8 +127,8 @@ const Profile = () => {
           <button
             onClick={() => setEditing(true)}
             style={{ position: 'absolute', bottom: 4, right: 4, width: 34, height: 34, borderRadius: '50%', background: 'var(--grad)', border: '3px solid var(--bg)', color: 'white', fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px var(--glow)' }}
-            title="Change photo"
-          >📷</button>
+            title="Edit profile"
+          >✏️</button>
         </div>
 
         <h2 style={{ marginTop: 14, fontSize: 22, fontWeight: 800 }}>{user?.name}</h2>
@@ -163,11 +163,39 @@ const Profile = () => {
             <h3 style={{ fontWeight: 800, fontSize: 18 }}>Edit Profile</h3>
 
             <div className="field">
-              <label>📸 Photo URL (paste any image link)</label>
-              <input name="profilePictureUrl" placeholder="https://example.com/photo.jpg" value={form.profilePictureUrl} onChange={onChange} />
-              {form.profilePictureUrl && (
-                <img src={form.profilePictureUrl} alt="Preview" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary)', marginTop: 6 }} onError={e => e.target.style.display = 'none'} />
-              )}
+              <label>📸 Profile Photo</label>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginTop: 8 }}>
+                {avatar && (
+                  <img src={avatar} alt="Preview" style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover', border: '2px solid var(--primary)' }} />
+                )}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    style={{ fontSize: 13, width: '100%', border: '1px dashed var(--muted)' }}
+                    onClick={() => document.getElementById('photo-upload').click()}
+                  >
+                    📂 Choose from Device
+                  </button>
+                  <input
+                    id="photo-upload"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={e => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setForm(p => ({ ...p, profilePictureUrl: reader.result }));
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                  <p style={{ fontSize: 11, color: 'var(--muted)' }}>Or paste an image URL below:</p>
+                  <input name="profilePictureUrl" placeholder="https://example.com/photo.jpg" value={form.profilePictureUrl} onChange={onChange} style={{ fontSize: 13 }} />
+                </div>
+              </div>
             </div>
 
             <div className="field">
