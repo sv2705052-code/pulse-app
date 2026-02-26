@@ -10,6 +10,7 @@ import userRoutes from "../backend/routes/users.js";
 import matchRoutes from "../backend/routes/matches.js";
 import messageRoutes from "../backend/routes/messages.js";
 import aiRoutes from "../backend/routes/ai.js";
+import notificationRoutes from "../backend/routes/notifications.js";
 
 dotenv.config();
 
@@ -53,6 +54,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/matches", matchRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // 404
 app.use((req, res) => res.status(404).json({ message: "Not found" }));
