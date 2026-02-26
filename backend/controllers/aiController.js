@@ -74,8 +74,12 @@ export const analyzeMatch = async (req, res) => {
         console.log("AI Raw Response:", responseText);
 
         // Clean up potential markdown formatting from AI response
-        const jsonString = responseText.replace(/```json|```/g, "").trim();
-        console.log("AI Cleaned JSON:", jsonString);
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error("AI did not return valid JSON");
+        }
+        const jsonString = jsonMatch[0];
+        console.log("AI Extracted JSON:", jsonString);
         const analysis = JSON.parse(jsonString);
 
         res.json(analysis);

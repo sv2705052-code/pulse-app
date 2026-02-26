@@ -26,6 +26,18 @@ export const getSwipeUsers = async (req, res) => {
       return [other];
     });
 
+    // Find users who have liked the current user but not yet reciprocated/matched
+    const incomingLikes = await Match.find({
+      $or: [
+        { user2: currentUserId, user1Liked: true, isMatched: false },
+        { user1: currentUserId, user2Liked: true, isMatched: false },
+      ],
+    });
+
+    const likedMeIds = incomingLikes.map(m =>
+      m.user1.toString() === currentUserId ? m.user2.toString() : m.user1.toString()
+    );
+
     // Get current user to check preferences
     const currentUser = await User.findById(currentUserId);
 
@@ -43,7 +55,15 @@ export const getSwipeUsers = async (req, res) => {
       .select("-password")
       .limit(20);
 
-    res.status(200).json(users);
+    const usersWithLikeStatus = users.map(user => {
+      const userObj = user.toObject();
+      if (likedMeIds.includes(user._id.toString())) {
+        userObj.hasLikedMe = true;
+      }
+      return userObj;
+    });
+
+    res.status(200).json(usersWithLikeStatus);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

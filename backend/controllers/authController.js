@@ -1,5 +1,7 @@
 import User from "../models/User.js";
+import OTP from "../models/OTP.js";
 import jwt from "jsonwebtoken";
+import { sendOTPEmail } from "../utils/emailService.js";
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -9,14 +11,20 @@ const generateToken = (userId) => {
 // Register User
 export const register = async (req, res) => {
   try {
-    const { name, email, password, age, gender, interestedIn, bio } = req.body;
+    const { name, email, password, age, gender, interestedIn, bio, otp } = req.body;
 
     // Validation
-    if (!name || !email || !password || !age || !gender || !interestedIn) {
+    if (!name || !email || !password || !age || !gender || !interestedIn || !otp) {
       return res.status(400).json({
         message:
-          "Please provide all required fields: name, email, password, age, gender, interestedIn",
+          "Please provide all required fields including the OTP code.",
       });
+    }
+
+    // Verify OTP first
+    const otpRecord = await OTP.findOne({ email, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
     // Check if user already exists
@@ -37,6 +45,9 @@ export const register = async (req, res) => {
     });
 
     await user.save();
+
+    // Delete OTP after successful registration
+    await OTP.deleteMany({ email });
 
     const token = generateToken(user._id);
 
@@ -95,6 +106,63 @@ export const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     res.status(200).json(user.toJSON());
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Send OTP
+export const sendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // Generate 6 digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Upsert OTP
+    await OTP.findOneAndUpdate(
+      { email },
+      { otp, createdAt: new Date() },
+      { upsert: true, new: true }
+    );
+
+    const emailSent = await sendOTPEmail(email, otp);
+
+    if (emailSent) {
+      res.status(200).json({ message: "OTP sent successfully" });
+    } else {
+      res.status(500).json({ message: "Failed to send OTP email. Please try again later." });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Verify OTP (helper for frontend if needed)
+export const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required" });
+    }
+
+    const otpRecord = await OTP.findOne({ email, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    res.status(200).json({ message: "OTP verified successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -1,5 +1,6 @@
 import Match from "../models/Match.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 
 // Like a user
 export const likeUser = async (req, res) => {
@@ -53,6 +54,41 @@ export const likeUser = async (req, res) => {
     }
 
     await match.save();
+
+    // Create Notification
+    try {
+      // Get current user for their name (for the recipient's notification)
+      const currentUser = await User.findById(currentUserId);
+
+      if (match.isMatched) {
+        // Notify both users about the match
+        await Notification.create([
+          {
+            recipient: currentUserId,
+            sender: targetUserId,
+            type: "match",
+            message: `You matched with ${targetUser.name}!`,
+          },
+          {
+            recipient: targetUserId,
+            sender: currentUserId,
+            type: "match",
+            message: `You matched with ${currentUser.name}!`,
+          },
+        ]);
+      } else {
+        // Notify target user about the like
+        await Notification.create({
+          recipient: targetUserId,
+          sender: currentUserId,
+          type: "like",
+          message: "Someone liked your profile!",
+        });
+      }
+    } catch (notifError) {
+      console.error("Failed to create notification:", notifError);
+      // Don't fail the whole request if notification fails
+    }
 
     res.status(200).json({
       message: match.isMatched ? "It's a match!" : "Like sent",

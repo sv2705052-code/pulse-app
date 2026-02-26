@@ -7,6 +7,7 @@ import userRoutes from "./routes/users.js";
 import matchRoutes from "./routes/matches.js";
 import messageRoutes from "./routes/messages.js";
 import aiRoutes from "./routes/ai.js";
+import notificationRoutes from "./routes/notifications.js";
 import seedRoutes from "./routes/seed.js";
 
 dotenv.config();
@@ -46,6 +47,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/matches", matchRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/seed", seedRoutes); // seed sample profiles
 
 // Error handling

@@ -21,6 +21,8 @@ api.interceptors.request.use((config) => {
 export const register = (data) => api.post('/auth/register', data);
 export const login = (data) => api.post('/auth/login', data);
 export const getCurrentUser = () => api.get('/auth/me');
+export const sendOtp = (email) => api.post('/auth/send-otp', { email });
+export const verifyOtp = (email, otp) => api.post('/auth/verify-otp', { email, otp });
 
 // Users
 export const getSwipeUsers = () => api.get('/users/swipe');
@@ -42,5 +44,10 @@ export const deleteMessage = (messageId) => api.delete(`/messages/${messageId}`)
 
 // AI
 export const getAiAnalysis = (matchId) => api.get(`/ai/analyze/${matchId}`);
+
+// Notifications
+export const getNotifications = () => api.get('/notifications');
+export const markNotificationRead = (id) => api.put(`/notifications/${id}/read`);
+export const deleteNotification = (id) => api.delete(`/notifications/${id}`);
 
 export default api;

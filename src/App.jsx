@@ -7,6 +7,7 @@ import Swipe from './pages/Swipe';
 import Matches from './pages/Matches';
 import Messages from './pages/Messages';
 import Profile from './pages/Profile';
+import Notifications from './pages/Notifications';
 import Navigation from './components/Navigation';
 import './styles/global.css';
 
@@ -53,6 +54,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <Notifications />
             </ProtectedRoute>
           }
         />

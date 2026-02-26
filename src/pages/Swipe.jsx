@@ -139,6 +139,12 @@ const Swipe = () => {
 
         {/* Info */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 24px 28px' }}>
+          {u.hasLikedMe && (
+            <div style={{ display: 'inline-block', background: 'var(--grad)', color: 'white', padding: '4px 12px', borderRadius: 99, fontSize: 10, fontWeight: 800, textTransform: 'uppercase', marginBottom: 12, boxShadow: '0 4px 12px rgba(255,45,85,.4)' }}>
+              Liked You 💜
+            </div>
+          )}
+
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 6 }}>
             <h2 style={{ fontSize: 30, fontWeight: 800, lineHeight: 1 }}>{u.name}</h2>
             <span style={{ fontSize: 22, fontWeight: 400, color: 'rgba(255,255,255,.6)' }}>{u.age}</span>
