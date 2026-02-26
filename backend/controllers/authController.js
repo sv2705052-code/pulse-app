@@ -1,7 +1,10 @@
 import User from "../models/User.js";
 import OTP from "../models/OTP.js";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
 import { sendOTPEmail } from "../utils/emailService.js";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Generate JWT Token
 const generateToken = (userId) => {
@@ -30,7 +33,12 @@ export const register = async (req, res) => {
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      if (existingUser.isVerified) {
+        return res.status(400).json({ message: "User already exists" });
+      } else {
+        // Delete the old unverified user so they can complete registration
+        await User.deleteOne({ email });
+      }
     }
 
     // Create new user
@@ -42,6 +50,7 @@ export const register = async (req, res) => {
       gender,
       interestedIn,
       bio: bio || "",
+      isVerified: true,
     });
 
     await user.save();
@@ -76,6 +85,10 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    if (!user.isVerified) {
+      return res.status(403).json({ message: "Your account is not verified. Please register again to verify your email." });
     }
 
     // Compare passwords
@@ -115,6 +128,7 @@ export const getCurrentUser = async (req, res) => {
 export const sendOTP = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("OTP Request for:", email);
 
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
@@ -122,8 +136,9 @@ export const sendOTP = async (req, res) => {
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+    if (existingUser && existingUser.isVerified) {
+      console.log("OTP Failed: User already exists -", email);
+      return res.status(400).json({ message: "An account with this email already exists. Please login instead." });
     }
 
     // Generate 6 digit OTP
@@ -141,10 +156,12 @@ export const sendOTP = async (req, res) => {
     if (emailSent) {
       res.status(200).json({ message: "OTP sent successfully" });
     } else {
-      res.status(500).json({ message: "Failed to send OTP email. Please try again later." });
+      // This part should theoretically not be hit due to fallback in emailService.js
+      res.status(500).json({ message: "System failure sending OTP. Please contact support." });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("CRITICAL OTP ERROR:", error);
+    res.status(500).json({ message: "Server error during OTP request: " + error.message });
   }
 };
 
@@ -165,5 +182,60 @@ export const verifyOTP = async (req, res) => {
     res.status(200).json({ message: "OTP verified successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// Google Login/Register
+export const googleLogin = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    if (!idToken) {
+      return res.status(400).json({ message: "ID Token is required" });
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub: googleId } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user if doesn't exist
+      user = new User({
+        name,
+        email,
+        password: Math.random().toString(36).slice(-10), // Random password for OAuth users
+        age: 18, // Default age, user can update later
+        gender: "other",
+        interestedIn: "both",
+        profilePictureUrl: picture,
+        isDiscoverable: true,
+        isVerified: true,
+      });
+      await user.save();
+    } else if (!user.isVerified) {
+      user.isVerified = true;
+      await user.save();
+    }
+
+    const token = generateToken(user._id);
+
+    // Update online status
+    user.isOnline = true;
+    user.lastSeen = new Date();
+    await user.save();
+
+    res.status(200).json({
+      message: "Google login successful",
+      token,
+      user: user.toJSON(),
+    });
+  } catch (error) {
+    console.error("Google Auth Error:", error);
+    res.status(500).json({ message: "Google authentication failed: " + error.message });
   }
 };

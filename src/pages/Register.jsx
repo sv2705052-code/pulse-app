@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { register as apiRegister, sendOtp as apiSendOtp } from '../services/api';
+import { register as apiRegister, sendOtp as apiSendOtp, googleLogin as apiGoogleLogin } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', age: '', gender: 'male', interestedIn: 'both', bio: '', otp: '' });
@@ -12,6 +13,17 @@ const Register = () => {
   const navigate = useNavigate();
 
   const onChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true); setError('');
+    try {
+      const res = await apiGoogleLogin(credentialResponse.credential);
+      login(res.data.token, res.data.user);
+      navigate('/swipe');
+    } catch (err) {
+      setError('Google registration failed. Please try again.');
+    } finally { setLoading(false); }
+  };
 
   const handleSendOtp = async () => {
     if (!form.email || !form.name || !form.password || !form.age) {
@@ -46,12 +58,14 @@ const Register = () => {
   const selectStyle = { background: 'var(--surface2)', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 16px', fontFamily: 'inherit', fontSize: 15, width: '100%' };
 
   return (
-    <div className="center" style={{ background: 'radial-gradient(ellipse at 60% 0%, rgba(168,85,247,.18) 0%, transparent 60%), var(--bg)', paddingTop: 40, paddingBottom: 40 }}>
-      <div style={{ width: '100%', maxWidth: 480 }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 40, marginBottom: 6 }}>💜</div>
-          <h1 style={{ fontSize: 28, fontWeight: 800 }} className="grad-text">Join Pulse</h1>
-          <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>Your perfect match is waiting</p>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID"}>
+      <div className="center" style={{ background: 'radial-gradient(ellipse at 60% 0%, rgba(168,85,247,.18) 0%, transparent 60%), var(--bg)', paddingTop: 40, paddingBottom: 40 }}>
+        <div style={{ width: '100%', maxWidth: 480 }}>
+          <div style={{ textAlign: 'center', marginBottom: 32 }}>
+            <div style={{ fontSize: 40, marginBottom: 6 }}>💜</div>
+            <h1 style={{ fontSize: 28, fontWeight: 800 }} className="grad-text">Join Pulse</h1>
+            <p style={{ color: 'var(--muted)', fontSize: 14, marginTop: 4 }}>Your perfect match is waiting</p>
+          </div>
         </div>
 
         <div className="glass" style={{ padding: '32px' }}>
@@ -118,6 +132,23 @@ const Register = () => {
                 {loading ? 'Creating your profile...' : 'Verify & Create Account ✦'}
               </button>
             )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '8px 0', color: 'var(--muted)', fontSize: 13 }}>
+              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+              OR
+              <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError('Google Authentication Failed')}
+                theme="dark"
+                shape="pill"
+                size="large"
+                width="100%"
+              />
+            </div>
           </form>
 
           <p style={{ textAlign: 'center', marginTop: 20, color: 'var(--muted)', fontSize: 14 }}>
@@ -125,7 +156,7 @@ const Register = () => {
           </p>
         </div>
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 };
 
