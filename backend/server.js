@@ -50,7 +50,8 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/seed", seedRoutes); // seed sample profiles
 
-// Error handling
+// Error handling (4-arg signature required for Express to treat this as an error handler)
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Internal server error" });

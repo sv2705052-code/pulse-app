@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login as apiLogin, googleLogin as apiGoogleLogin } from '../services/api';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/authContextObject';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
@@ -20,6 +20,7 @@ const Login = () => {
       login(res.data.token, res.data.user);
       navigate('/swipe');
     } catch (err) {
+      console.error('Google login failed:', err);
       setError('Google login failed. Please try again.');
     } finally { setLoading(false); }
   };

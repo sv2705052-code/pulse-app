@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getConversation, sendMessage, getUserProfile } from '../services/api';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/authContextObject';
 
 const Messages = () => {
   const { userId } = useParams();
@@ -15,6 +15,7 @@ const Messages = () => {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   useEffect(() => {

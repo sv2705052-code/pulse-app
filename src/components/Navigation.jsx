@@ -19,7 +19,9 @@ const Navigation = () => {
       try {
         const res = await getNotifications();
         setHasUnread(res.data.some(n => !n.isRead));
-      } catch (e) { /* ignore */ }
+      } catch {
+        // notification polling is best-effort; ignore failures
+      }
     };
     checkNotifications();
     const interval = setInterval(checkNotifications, 30000); // Check every 30s

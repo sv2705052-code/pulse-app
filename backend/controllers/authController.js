@@ -199,7 +199,7 @@ export const googleLogin = async (req, res) => {
     });
 
     const payload = ticket.getPayload();
-    const { email, name, picture, sub: googleId } = payload;
+    const { email, name, picture } = payload;
 
     let user = await User.findOne({ email });
 

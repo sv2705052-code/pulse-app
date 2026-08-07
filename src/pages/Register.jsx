@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { register as apiRegister, sendOtp as apiSendOtp, googleLogin as apiGoogleLogin } from '../services/api';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/authContextObject';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const Register = () => {
@@ -21,6 +21,7 @@ const Register = () => {
       login(res.data.token, res.data.user);
       navigate('/swipe');
     } catch (err) {
+      console.error('Google registration failed:', err);
       setError('Google registration failed. Please try again.');
     } finally { setLoading(false); }
   };

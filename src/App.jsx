@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthContext } from './context/AuthContext';
+import { AuthContext } from './context/authContextObject';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Swipe from './pages/Swipe';

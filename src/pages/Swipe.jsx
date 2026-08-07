@@ -31,7 +31,9 @@ const Swipe = () => {
           setMatchNotif({ name: matchedUser.name, photo: matchedUser.profilePictureUrl });
           setTimeout(() => setMatchNotif(null), 3500);
         }
-      } catch { }
+      } catch (err) {
+        console.error('Swipe action failed:', err);
+      }
       setSwipeDir(null);
       setIdx(p => p + 1);
     }, 350);

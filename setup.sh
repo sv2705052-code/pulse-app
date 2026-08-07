@@ -1,26 +1,18 @@
 #!/bin/bash
+set -e
 
-echo "🚀 Starting Tinder App Setup..."
-
-# Install backend dependencies
-echo "📦 Installing backend dependencies..."
+echo "Installing backend dependencies..."
 cd backend
 npm install
 
-# Install frontend dependencies
-echo "📦 Installing frontend dependencies..."
+echo "Installing frontend dependencies..."
 cd ..
 npm install
 
-echo "✅ Installation complete!"
 echo ""
-echo "🎉 To start the app:"
+echo "Setup complete. To run the app locally:"
 echo ""
-echo "Terminal 1 - Backend:"
-echo "  cd backend"
-echo "  npm start"
+echo "  Terminal 1: cd backend && npm start"
+echo "  Terminal 2: npm run dev"
 echo ""
-echo "Terminal 2 - Frontend:"
-echo "  npm run dev"
-echo ""
-echo "Then open: http://localhost:5173"
+echo "Then open http://localhost:5173"

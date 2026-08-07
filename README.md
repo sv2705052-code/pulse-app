@@ -1,203 +1,94 @@
-# 🔥 Tinder Clone - Full Stack Application
+# Pulse
 
-A fully functional Tinder-like dating app built with React, Express, and MongoDB.
+A dating app built with React, Express, and MongoDB. Users create a profile, swipe on other users, match, and message each other.
 
-## 🚀 Features
+## Stack
 
-- **User Authentication**: Register and login with secure JWT tokens
-- **User Profiles**: Create and edit user profiles with photos, interests, and bio
-- **Swipe System**: Swipe right (like) or left (pass) on user profiles
-- **Matching**: Get matched when both users like each other
-- **Real-time Messaging**: Chat with matched users
-- **Responsive Design**: Works on desktop and mobile devices
-- **MongoDB Database**: All data persisted in MongoDB Atlas
+- **Frontend:** React 19, React Router, Axios, Vite
+- **Backend:** Node.js, Express, MongoDB (Mongoose), JWT auth, bcrypt
 
-## 📋 Tech Stack
+## Project layout
 
-### Frontend
-- React 19
-- React Router for navigation
-- Axios for API calls
-- CSS3 for styling
+```
+pulse-app/
+├── api/index.js        # Vercel serverless entry point (wraps the Express app)
+├── backend/             # Express API (used for local dev, mirrors api/index.js)
+│   ├── config/db.js
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   └── server.js
+├── src/                 # React frontend
+│   ├── pages/
+│   ├── components/
+│   ├── services/api.js
+│   └── context/AuthContext.jsx
+└── vercel.json
+```
 
-### Backend
-- Node.js with Express
-- MongoDB with Mongoose ODM
-- JWT for authentication
-- Bcrypt for password hashing
+## Running locally
 
-## 🛠️ Installation & Setup
+You'll need Node 18+ and a MongoDB connection string (a free MongoDB Atlas cluster works fine).
 
-### 1. Backend Setup
+**1. Backend**
 
 ```bash
-# Navigate to backend folder
 cd backend
-
-# Install dependencies
 npm install
-
-# The .env file already has your MongoDB connection string configured
-# Just run the server
+cp .env.example .env   # then fill in MONGO_URI, JWT_SECRET, etc.
 npm start
 ```
 
-Server will run on `http://localhost:8000`
+Runs on `http://localhost:8005`.
 
-### 2. Frontend Setup
+**2. Frontend**
 
 ```bash
-# Install dependencies (in root folder)
 npm install
-
-# Start the development server
 npm run dev
 ```
 
-Frontend will run on `http://localhost:5173`
+Runs on `http://localhost:5173`.
 
-## 📚 API Endpoints
+Or just run `./setup.sh` (Mac/Linux) or `setup.bat` (Windows) to install both at once.
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user (requires token)
+## Environment variables
 
-### Users
-- `GET /api/users/swipe` - Get users for swiping
-- `GET /api/users/matches` - Get all matches
-- `PUT /api/users/profile` - Update profile
-- `GET /api/users/:userId` - Get user profile
-
-### Matches
-- `POST /api/matches/like` - Like a user
-- `POST /api/matches/pass` - Pass on a user
-- `POST /api/matches/unlike` - Unlike a user
-
-### Messages
-- `POST /api/messages/send` - Send a message
-- `GET /api/messages/conversations` - Get all conversations
-- `GET /api/messages/:otherUserId` - Get conversation with a user
-- `DELETE /api/messages/:messageId` - Delete a message
-
-## 🚀 Features Implemented
-
-✅ User Registration & Login  
-✅ Profile Management  
-✅ Swipe/Like/Pass System  
-✅ Matching Algorithm  
-✅ Real-time Messaging  
-✅ Authentication & Authorization  
-✅ Responsive UI  
-✅ MongoDB Integration  
-
-## 📁 Project Structure
+`backend/.env` (copy from `backend/.env.example`):
 
 ```
-Tinder/
-├── backend/
-│   ├── config/
-│   │   └── db.js
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── userController.js
-│   │   ├── matchController.js
-│   │   └── messageController.js
-│   ├── middleware/
-│   │   └── auth.js
-│   ├── models/
-│   │   ├── User.js
-│   │   ├── Match.js
-│   │   └── Message.js
-│   ├── routes/
-│   │   ├── auth.js
-│   │   ├── users.js
-│   │   ├── matches.js
-│   │   └── messages.js
-│   ├── .env
-│   ├── server.js
-│   └── package.json
-├── src/
-│   ├── pages/
-│   │   ├── Login.jsx
-│   │   ├── Register.jsx
-│   │   ├── Swipe.jsx
-│   │   ├── Matches.jsx
-│   │   ├── Messages.jsx
-│   │   └── Profile.jsx
-│   ├── components/
-│   │   └── Navigation.jsx
-│   ├── services/
-│   │   └── api.js
-│   ├── context/
-│   │   └── AuthContext.jsx
-│   ├── styles/
-│   │   ├── global.css
-│   │   ├── Auth.css
-│   │   ├── Swipe.css
-│   │   ├── Matches.css
-│   │   ├── Messages.css
-│   │   ├── Profile.css
-│   │   └── Navigation.css
-│   ├── App.jsx
-│   └── main.jsx
-└── package.json
-```
-
-## 🔐 Environment Variables
-
-The `.env` file in the backend folder contains:
-```
-MONGO_URI=mongodb+srv://tinder_user:U0amWVAmabqDKyvl@cluster0.vtzk1id.mongodb.net/?appName=Cluster0
-JWT_SECRET=tinder_super_secret_key_2024_change_in_production
-PORT=8000
+MONGO_URI=your MongoDB connection string
+JWT_SECRET=any random string
+PORT=8005
 NODE_ENV=development
+GEMINI_API_KEY=optional, only needed for the AI compatibility feature
 ```
 
-## ⚙️ How to Run
+Never commit a real `.env` file — it's already covered by `.gitignore`.
 
-1. **Start the Backend Server**:
-   ```bash
-   cd backend
-   npm install
-   npm start
-   ```
+## API
 
-2. **In a new terminal, start the Frontend**:
-   ```bash
-   npm install
-   npm run dev
-   ```
+**Auth** — `/api/auth`
+- `POST /register`, `POST /login`, `GET /me`
+- `POST /send-otp`, `POST /verify-otp` — email verification
+- `POST /google` — Google sign-in
 
-3. **Open your browser**:
-   - Go to `http://localhost:5173`
-   - Register a new account or login
-   - Start swiping!
+**Users** — `/api/users`
+- `GET /swipe` — candidates to swipe on
+- `GET /matches`, `PUT /profile`, `GET /:userId`
 
-## 🎯 Usage Flow
+**Matches** — `/api/matches`
+- `POST /like`, `POST /pass`, `POST /unlike`
 
-1. **Register**: Create a new account with name, email, age, gender preferences, and bio
-2. **Browse**: View available profiles on the swipe page
-3. **Swipe**: Click ❤ to like or ❌ to pass
-4. **Match**: When both users like each other, it's a match!
-5. **Message**: Click on a match to start messaging
-6. **Profile**: Update your profile information anytime
+**Messages** — `/api/messages`
+- `POST /send`, `GET /conversations`, `GET /:otherUserId`, `DELETE /:messageId`
 
-## 🔄 Future Enhancements
+**AI** — `/api/ai`
+- `GET /analyze/:matchId` — Gemini-based compatibility summary
 
-- Real-time notifications for matches
-- Video chat functionality
-- Advanced filtering and search
-- User reviews and ratings
-- Admin dashboard for moderation
-- Subscription plans
-- Social media integration
-- Location-based matching
+**Notifications** — `/api/notifications`
 
-## 📧 Support
+## Deployment
 
-For questions or issues, please create an issue in the repository.
-
----
-
-**Built with ❤️ using React, Node.js, and MongoDB**
+The app is set up to deploy on Vercel as a single project: the React app builds to static files, and `api/index.js` runs as a serverless function for everything under `/api/*` (see `vercel.json`). See the deployment steps below.

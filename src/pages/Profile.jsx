@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/authContextObject';
 import { updateProfile } from '../services/api';
 import api from '../services/api';
 

@@ -1,28 +1,31 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getCurrentUser } from '../services/api';
-
-export const AuthContext = createContext();
+import { AuthContext } from './authContextObject';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (token) {
-      fetchUser();
-    }
-  }, [token]);
-
   const fetchUser = async () => {
+    setLoading(true);
     try {
       const response = await getCurrentUser();
       setUser(response.data);
     } catch (error) {
       console.error('Failed to fetch user:', error);
       logout();
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      fetchUser();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   const login = (newToken, userData) => {
     localStorage.setItem('token', newToken);

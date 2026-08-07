@@ -42,7 +42,13 @@ const connectDB = async () => {
 
 // Connect before every request
 app.use(async (req, res, next) => {
-    try { await connectDB(); next(); } catch (e) { res.status(500).json({ message: "DB connection failed" }); }
+    try {
+        await connectDB();
+        next();
+    } catch (e) {
+        console.error("DB connection failed:", e.message);
+        res.status(500).json({ message: "DB connection failed" });
+    }
 });
 
 // Health check
